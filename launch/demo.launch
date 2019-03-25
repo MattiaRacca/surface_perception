@@ -1,0 +1,11 @@
+<launch>
+
+    <arg name="crop_min" default="-0.1"/>
+    <arg name="crop_max" default="0.6"/>
+	
+    <node pkg="surface_perception" type="demo" name="surface_perception">
+      <remap from="/cloud_in" to="/camera/depth/points" />
+      <param name="target_frame" value="marker_00" />
+    </node>
+
+</launch>

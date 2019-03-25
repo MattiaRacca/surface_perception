@@ -35,7 +35,8 @@ Demo::Demo(const SurfaceViz& viz, const std::string& target_frame,
     : viz_(viz),
       input_pub_(input_pub),
       target_frame_(target_frame),
-      tf_listener_() {}
+      tf_listener_() {
+  }
 
 void Demo::Callback(const sensor_msgs::PointCloud2ConstPtr& cloud) {
   PointCloudC::Ptr pcl_cloud_raw(new PointCloudC);
@@ -144,11 +145,9 @@ int main(int argc, char** argv) {
       nh.advertise<visualization_msgs::Marker>("surface_objects", 100);
   ros::Publisher cropped_input_pub = nh.advertise<sensor_msgs::PointCloud2>(
       "demo_cropped_input_cloud", 1, true);
-
-  std::string target_frame("base_link");
-  if (argc > 1) {
-    target_frame = argv[1];
-  }
+  
+  std::string target_frame("camera_link");
+  nh.getParam("target_frame", target_frame);
 
   SurfaceViz viz(marker_pub);
   Demo demo(viz, target_frame, cropped_input_pub);
