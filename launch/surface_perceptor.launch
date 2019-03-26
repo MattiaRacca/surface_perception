@@ -2,11 +2,13 @@
 
     <arg name="crop_min" default="-0.1"/>
     <arg name="crop_max" default="0.6"/>
+    <arg name="target_frame" default="marker_00"/>
+    <arg name="cloud_in" default="/camera/depth_registered/points"/>
 	
     <node pkg="surface_perception" type="surface_perceptor" name="surface_perceptor">
       <!-- CLOUD IN and GRAVITY ALIGNED FRAME -->
-      <remap from="/cloud_in" to="/camera/depth_registered/points" />
-      <param name="target_frame" value="marker_00" />
+      <remap from="/cloud_in" to="$(arg cloud_in)" />
+      <param name="target_frame" value="$(arg target_frame)" />
       
       <!-- CROPPING PARAMETERS -->
       <param name="crop_min_x" value="$(arg crop_min)" />
