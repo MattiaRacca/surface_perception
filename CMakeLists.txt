@@ -115,6 +115,13 @@ target_link_libraries(surface_perception_demo
   ${catkin_LIBRARIES}
   surface_perception_segmentation
   surface_perception_visualization)
+  
+add_executable(surface_perceptor src/surface_perceptor_node.cpp
+                  src/surface_perceptor.cpp)
+target_link_libraries(surface_perceptor
+  ${catkin_LIBRARIES}
+  surface_perception_segmentation
+  surface_perception_visualization)
 
 #############
 ## Install ##
