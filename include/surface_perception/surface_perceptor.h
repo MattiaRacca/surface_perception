@@ -33,6 +33,7 @@ class SurfacePerceptor {
   ros::Subscriber pc_sub_;
   std::string target_frame_;
   tf::TransformListener tf_listener_;
+  SurfaceViz *viz_;
 };
 
 #endif // SURFACE_PERCEPTOR_H

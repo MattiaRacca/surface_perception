@@ -4,13 +4,13 @@ SurfacePerceptor::SurfacePerceptor()
     : nh_("~"),
       tf_listener_() {
       marker_pub_ = nh_.advertise<visualization_msgs::Marker>("surface_objects", 100);
+      viz_ = new SurfaceViz(marker_pub_);
       cropped_input_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("cropped_cloud", 1, true);
       nh_.getParam("target_frame", target_frame_);
       pc_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/cloud_in", 1, &SurfacePerceptor::Callback, this);
     }
 
 void SurfacePerceptor::Callback(const sensor_msgs::PointCloud2ConstPtr& cloud) {
-  SurfaceViz viz_(marker_pub_);
   PointCloudC::Ptr pcl_cloud_raw(new PointCloudC);
   pcl::fromROSMsg(*cloud, *pcl_cloud_raw);
   PointCloudC::Ptr pcl_cloud(new PointCloudC);
@@ -46,7 +46,6 @@ void SurfacePerceptor::Callback(const sensor_msgs::PointCloud2ConstPtr& cloud) {
   nh_.param<double>("crop_max_x", max_x, 2.0);
   nh_.param<double>("crop_max_y", max_y, 2.0);
   nh_.param<double>("crop_max_z", max_z, 2.0);
-  // ros::param::param("crop_min_x", min_x, 0.0);
 
   Eigen::Vector4f min;
   min << min_x, min_y, min_z, 1;
@@ -60,25 +59,22 @@ void SurfacePerceptor::Callback(const sensor_msgs::PointCloud2ConstPtr& cloud) {
   pcl::toROSMsg(*cropped_cloud, msg_out);
   cropped_input_pub_.publish(msg_out);
 
-  double horizontal_tolerance_degrees;
-  ros::param::param("horizontal_tolerance_degrees",
-                    horizontal_tolerance_degrees, 10.0);
-  double margin_above_surface;
-  ros::param::param("margin_above_surface", margin_above_surface, 0.025);
-  double max_point_distance;
-  ros::param::param("max_point_distance", max_point_distance, 0.015);
-  double cluster_distance;
-  ros::param::param("cluster_distance", cluster_distance, 0.01);
-  int min_cluster_size;
-  ros::param::param("min_cluster_size", min_cluster_size, 100);
-  int max_cluster_size;
-  ros::param::param("max_cluster_size", max_cluster_size, 5000);
-  int min_surface_size;
-  ros::param::param("min_surface_size", min_surface_size, 5000);
-  int min_surface_exploration_iteration;
-  ros::param::param("min_surface_exploration_iteration",
+  double horizontal_tolerance_degrees, margin_above_surface,
+    max_point_distance, cluster_distance;
+  nh_.param<double>("horizontal_tolerance_degrees",
+    horizontal_tolerance_degrees, 10.0);
+  nh_.param<double>("margin_above_surface", margin_above_surface, 0.025);
+  nh_.param<double>("max_point_distance", max_point_distance, 0.015);
+  nh_.param<double>("cluster_distance", cluster_distance, 0.01);
+  
+  int min_cluster_size, max_cluster_size, min_surface_size,
+    min_surface_exploration_iteration;
+  nh_.param<int>("min_cluster_size", min_cluster_size, 100);
+  nh_.param<int>("max_cluster_size", max_cluster_size, 5000);
+  nh_.param<int>("min_surface_size", min_surface_size, 5000);
+  nh_.param<int>("min_surface_exploration_iteration",
                     min_surface_exploration_iteration, 1000);
-
+  
   surface_perception::Segmentation seg;
   seg.set_input_cloud(pcl_cloud);
   seg.set_indices(point_indices);
@@ -105,7 +101,7 @@ void SurfacePerceptor::Callback(const sensor_msgs::PointCloud2ConstPtr& cloud) {
              object_count);
   }
 
-  viz_.Hide();
-  viz_.set_surface_objects(surface_objects);
-  viz_.Show();
+  viz_->Hide();
+  viz_->set_surface_objects(surface_objects);
+  viz_->Show();
 }

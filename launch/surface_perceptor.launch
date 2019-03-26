@@ -1,0 +1,32 @@
+<launch>
+
+    <arg name="crop_min" default="-0.1"/>
+    <arg name="crop_max" default="0.6"/>
+	
+    <node pkg="surface_perception" type="surface_perceptor" name="surface_perceptor">
+      <!-- CLOUD IN and GRAVITY ALIGNED FRAME -->
+      <remap from="/cloud_in" to="/camera/depth_registered/points" />
+      <param name="target_frame" value="marker_00" />
+      
+      <!-- CROPPING PARAMETERS -->
+      <param name="crop_min_x" value="$(arg crop_min)" />
+      <param name="crop_max_x" value="$(arg crop_max)" />
+      <param name="crop_min_y" value="$(arg crop_min)" />
+      <param name="crop_max_y" value="$(arg crop_max)" />
+      <param name="crop_min_z" value="$(arg crop_min)" />
+      <param name="crop_max_z" value="0.1" />
+      
+      <!-- SURFACE SEGMENTATION PARAMETERS -->
+      <param name="horizontal_tolerance_degrees" value="10.0" />
+      <param name="margin_above_surface" value="0.025" />
+      <param name="min_surface_size" value="5000" />
+      <param name="min_surface_exploration_iteration" value="100" />
+      
+      <!-- CLUSTER SEGMENTATION PARAMETERS -->
+      <param name="max_point_distance" value="0.025" />
+      <param name="cluster_distance" value="0.01" />
+      <param name="min_cluster_size" value="200" />
+      <param name="max_cluster_size" value="5000" />
+    </node>
+
+</launch>
